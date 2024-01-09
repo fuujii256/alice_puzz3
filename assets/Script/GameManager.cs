@@ -68,6 +68,10 @@ public class GameManager : MonoBehaviour
     
     static public int trigger = 0;
     int list_num;
+    float next_x;
+    float next_y;
+    float next_z;
+
     public bool all_seishi = false; //全てのオブジェクトが静止しているか？
     public List<GameObject> blockList = new List<GameObject>();   //管理するブロックのリスト
     public List<GameObject> deleteList = new List<GameObject>();  //消去するブロックのリスト
@@ -145,7 +149,7 @@ public class GameManager : MonoBehaviour
         GameObject block_2_Prefab = Resources.Load<GameObject>("block2");
         GameObject block_3_Prefab = Resources.Load<GameObject>("block3");
         GameObject block_4_Prefab = Resources.Load<GameObject>("block4");
-        //GameObject block_5_Prefab = Resources.Load<GameObject>("Block_5");
+        GameObject block_5_Prefab = Resources.Load<GameObject>("Block5");
         GameObject star_1_Prefab = Resources.Load<GameObject>("star1");
         GameObject star_b_Prefab = Resources.Load<GameObject>("starB");
         GameObject star_c_Prefab = Resources.Load<GameObject>("starC");
@@ -157,14 +161,33 @@ public class GameManager : MonoBehaviour
             int i = 0;
             while(i<1)    //同時生成するブロックの数
             {
-                first_block = next_block;
-                next_block = Random.Range(1, 5);
-                // nextblockを表示
 
-                float x = -3.5f+ i*0.5f;
-                float y = 3.24f;
-                float z = 0.0f;
-                Vector3 v3 = new Vector3(x,y,z);
+
+                if (Random.Range(1,20)==1)
+                {                                    //お邪魔ブロック５の処理
+                    first_block = 5;
+
+                    next_x = -5.0f + Random.Range(0,6)*0.75f;
+                    next_y = 3.24f;
+                    next_z = 0.0f;
+
+                }
+                else
+                {                
+                                                            //通常ブロックの処理
+                    first_block = next_block;
+                    next_block = Random.Range(1, 5);
+
+
+                    // nextblockを表示
+
+                    next_x = -3.5f+ i*0.5f;
+                    next_y = 3.24f;
+                    next_z = 0.0f;
+                
+                }
+
+                Vector3 v3 = new Vector3(next_x,next_y,next_z);
 
                 new_instance = block_1_Prefab;
         
@@ -182,9 +205,9 @@ public class GameManager : MonoBehaviour
                     case 4:
                         new_instance = block_4_Prefab;
                         break;
-                    //case 5:
-                    //    new_instance = block_5_Prefab;
-                    //    break;
+                    case 5:
+                        new_instance = block_5_Prefab;
+                        break;
                 }   
 
                 if (block_matrix[0,3] == 0)
@@ -193,7 +216,16 @@ public class GameManager : MonoBehaviour
                     Block_move component = block.AddComponent<Block_move>();
                     component.advent_no = Advent_num;    //出現させるのは何個目のブロックか
                     component.advent_type = first_block +1;    //出現させるブロックの種類  ２～５ブロック　０：消すブロック
-            
+                    if (first_block == 5){
+                        component.rakka = true;     //落下モードにさせる 
+                        player_control = false;
+                    }
+                    else 
+                    {
+                        player_control = true;
+                    }
+
+
                     blockList.Add(block);
 
                     if (blockList.Count != 0)
@@ -205,7 +237,7 @@ public class GameManager : MonoBehaviour
                         list_num = blockList.Count;
                     }
 
-                    player_control = true;
+                    //player_control = true;
                 }
                 else
                 {
