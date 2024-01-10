@@ -57,6 +57,8 @@ public class GameManager : MonoBehaviour
     float temp_x;
     float temp_y;
 
+    int ojama_cnt = 1;          //お邪魔ユウカの出現カウント
+
     static public int game_level = 0;
 
     static public int hi_score;
@@ -162,11 +164,11 @@ public class GameManager : MonoBehaviour
             while(i<1)    //同時生成するブロックの数
             {
 
-
-                if (Random.Range(1,20)==1)
+                ojama_cnt ++;
+                if (ojama_cnt%15 == 0)
                 {                                    //お邪魔ブロック５の処理
                     first_block = 5;
-
+                    ojama_cnt = 1;
                     next_x = -5.0f + Random.Range(0,6)*0.75f;
                     next_y = 3.24f;
                     next_z = 0.0f;
