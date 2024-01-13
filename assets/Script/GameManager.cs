@@ -36,12 +36,22 @@ public class GameManager : MonoBehaviour
     public AudioClip block_move;
     public AudioClip block_rakka;
 
+    public AudioClip arigatou;
+    public AudioClip kangekidesu;
+    public AudioClip sugoidesu;
+    public AudioClip yarimashita;
+    public AudioClip panpakapan;
+    public AudioClip yoroshiku;
+
+    public GameObject sc_star_level;
+
     GameObject block; 
 
     //float game_Time = 0.0f;
     //float game_Time_Cnt = 0.0f;
 
     Block_move script;
+    static public int star_level =0;         //ためた星の力
     int rensa_cnt;
     int axisH;
     int axisH_old;
@@ -135,7 +145,9 @@ public class GameManager : MonoBehaviour
         if(soundPlayer != null)
         {
             //soundPlayer.Stop();
-            soundPlayer.PlayOneShot(meGameStart);
+            //soundPlayer.PlayOneShot(meGameStart);
+            soundPlayer.PlayOneShot(yoroshiku);
+
             soundPlayer.Play();
         }
         
@@ -391,7 +403,7 @@ public class GameManager : MonoBehaviour
                         if (block_matrix_tag[j, i] == block_matrix_tag[j + 2, i])
                         {
                             Debug.Log("height_success3!");
-                            score += 30 * rensa_cnt;
+                            score += 30 * rensa_cnt * rensa_cnt;
                             UpdateScore();
                             //block_moveのisMatchingをtrueに
                             k = (int)block_matrix[j,i];
@@ -414,7 +426,7 @@ public class GameManager : MonoBehaviour
                             if (block_matrix_tag[j, i] == block_matrix_tag[j + 1, i +1])
                             {
                                 Debug.Log("height L1_success3!");
-                                score += 30 *rensa_cnt;
+                                score += 30 *rensa_cnt * rensa_cnt;
                                 UpdateScore();
                                 //block_moveのisMatchingをtrueに
                                 k = (int)block_matrix[j,i];
@@ -437,7 +449,7 @@ public class GameManager : MonoBehaviour
                                 if (block_matrix_tag[j, i] == block_matrix_tag[j + 1, i -1])
                                 {
                                     Debug.Log("height L2_success3!");
-                                    score += 30 *rensa_cnt;
+                                    score += 30 *rensa_cnt * rensa_cnt;
                                     UpdateScore();
                                     //block_moveのisMatchingをtrueに
                                     k = (int)block_matrix[j,i];
@@ -460,7 +472,7 @@ public class GameManager : MonoBehaviour
                                     if (block_matrix_tag[j, i] == block_matrix_tag[j , i +1])
                                     {
                                         Debug.Log("height LSP_success3!");
-                                        score += 30*rensa_cnt;
+                                        score += 30*rensa_cnt * rensa_cnt;
                                         UpdateScore();
                                         //block_moveのisMatchingをtrueに
                                         k = (int)block_matrix[j,i];
@@ -506,7 +518,7 @@ public class GameManager : MonoBehaviour
                         if (block_matrix_tag[i, j] == block_matrix_tag[i , j +2])
                         {
                             Debug.Log("width_success3!");
-                            score +=30 *rensa_cnt;
+                            score +=30 *rensa_cnt * rensa_cnt;
                             UpdateScore();
                             //block_moveのisMatchingをtrueに
                             k = (int)block_matrix[i,j];                        
@@ -526,7 +538,7 @@ public class GameManager : MonoBehaviour
                             if (block_matrix_tag[i, j] == block_matrix_tag[i+1 , j +1])
                             {
                                 Debug.Log("width_L3_success3!");
-                                score +=30 * rensa_cnt;
+                                score +=30 * rensa_cnt * rensa_cnt;
                                 UpdateScore();
                                 //block_moveのisMatchingをtrueに
                                 k = (int)block_matrix[i,j];                        
@@ -546,7 +558,7 @@ public class GameManager : MonoBehaviour
                                 if (block_matrix_tag[i, j] == block_matrix_tag[i-1 , j +1])
                                 {
                                     Debug.Log("width_L4_success3!");
-                                    score +=30 * rensa_cnt;
+                                    score +=30 * rensa_cnt * rensa_cnt;
                                     UpdateScore();
                                     //block_moveのisMatchingをtrueに
                                     k = (int)block_matrix[i,j];                        
@@ -627,7 +639,25 @@ public class GameManager : MonoBehaviour
 
                     //Destroy(item);
                 }
+                                //連鎖回数によって分岐処理をする
+                if (rensa_cnt == 1){
+                    soundPlayer.PlayOneShot(panpakapan);
+                }
+                if (rensa_cnt == 2){
+                    soundPlayer.PlayOneShot(yarimashita);
+                }
+                if (rensa_cnt == 3){
+                    soundPlayer.PlayOneShot(sugoidesu);
+                }
+                if (rensa_cnt >= 4){
+                    soundPlayer.PlayOneShot(kangekidesu);
+                }
+
+                star_level += (2 * rensa_cnt + rensa_cnt) *rensa_cnt ;      //連鎖数に応じてstarlevelを上げる
+                sc_star_level.GetComponent<Text>().text = star_level.ToString();
+
                 rensa_cnt++;   //連鎖消去のカウンタ
+
                 trigger = 1;   //最初のブロック静止判定へ戻る   
             }
             else
