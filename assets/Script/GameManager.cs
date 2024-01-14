@@ -28,6 +28,18 @@ public class GameManager : MonoBehaviour
     public GameObject hi_scoreText;
     public GameObject star_light;
 
+    //GameObject[] ondokei = new GameObject[10];
+    public GameObject ondokei_1;  //温度計表示のマスク用のオブジェクト　
+    public GameObject ondokei_2; 
+    public GameObject ondokei_3; 
+    public GameObject ondokei_4; 
+    public GameObject ondokei_5; 
+    public GameObject ondokei_6;
+    public GameObject ondokei_7; 
+    public GameObject ondokei_8; 
+    public GameObject ondokei_9; 
+    public GameObject ondokei_10;
+
     AudioSource soundPlayer;
     public AudioClip meGameStart;
     public AudioClip meGamePlaying;
@@ -606,10 +618,10 @@ public class GameManager : MonoBehaviour
                     soundPlayer.PlayOneShot(block_erase);
                 }
 
-                if ( game_level <255 )      //ブロックが消されたら、レベルを上げる（最大値２５５）
+                if ( game_level <100 )      //ブロックが消されたら、レベルを上げる（最大値２５５）
                 {
                     game_level++;   //ゲームレベルを上げる
-                    Physics2D.gravity = new Vector3(0, -5*game_level, 0);  //重力を加える
+                    Physics2D.gravity = new Vector3(0, -2*game_level, 0);  //重力を加える
                 }
 
                 //該当する配列をnullにして（内部管理）、ブロックを消去する（見た目）。
@@ -631,12 +643,14 @@ public class GameManager : MonoBehaviour
                     new_instance = star_1_Prefab;                     
                     Instantiate( new_instance , pos , Quaternion.Euler(0, 0, 0)); //爆発パターンを生成
 
-                    new_instance = star_b_Prefab;                     
-                    Instantiate( new_instance , pos , Quaternion.Euler(0, 0, 0)); //動く星のパターンを生成 
+                    if (rensa_cnt >=2 ) {
+                        new_instance = star_b_Prefab;                     
+                        Instantiate( new_instance , pos , Quaternion.Euler(0, 0, 0)); //動く星のパターンを生成 
 
-                    new_instance = star_c_Prefab;                     
-                    Instantiate( new_instance , pos , Quaternion.Euler(0, 0, 0)); //まわる星のパターンを生成 
 
+                        new_instance = star_c_Prefab;                     
+                        Instantiate( new_instance , pos , Quaternion.Euler(0, 0, 0)); //まわる星のパターンを生成 
+                    }
                     //Destroy(item);
                 }
                                 //連鎖回数によって分岐処理をする
@@ -653,8 +667,41 @@ public class GameManager : MonoBehaviour
                     soundPlayer.PlayOneShot(kangekidesu);
                 }
 
-                star_level += (2 * rensa_cnt + rensa_cnt) *rensa_cnt ;      //連鎖数に応じてstarlevelを上げる
+                star_level += (2 * rensa_cnt + rensa_cnt) *rensa_cnt -1;      //連鎖数に応じてstarlevelを上げる
                 sc_star_level.GetComponent<Text>().text = star_level.ToString();
+
+                //「ほしの温度計」の更新
+                if (star_level >10) {
+                                //マスクを非表示に切り替える
+                    ondokei_1.gameObject.SetActive(false);
+                }
+                if (star_level >20) {
+                    ondokei_2.gameObject.SetActive(false);
+                }
+                if (star_level >30) {
+                    ondokei_3.gameObject.SetActive(false);
+                }
+                if (star_level >40) {
+                    ondokei_4.gameObject.SetActive(false);
+                }
+                if (star_level >50) {
+                    ondokei_5.gameObject.SetActive(false);
+                }
+                if (star_level >60) {
+                    ondokei_6.gameObject.SetActive(false);
+                }
+                if (star_level >70) {
+                    ondokei_7.gameObject.SetActive(false);
+                }
+                if (star_level >80) {
+                    ondokei_8.gameObject.SetActive(false);
+                }
+                if (star_level >90) {
+                    ondokei_9.gameObject.SetActive(false);
+                }
+                if (star_level >=100) {           
+                    ondokei_10.gameObject.SetActive(false);
+                }
 
                 rensa_cnt++;   //連鎖消去のカウンタ
 
