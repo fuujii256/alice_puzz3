@@ -22,9 +22,13 @@ public class GameManager : MonoBehaviour
     GameObject new_instance;        //新しいオブジェクトの生成用
     public GameObject UnderWall;
     public GameObject GameOver;
+    public GameObject GameClear;
     public GameObject start_text;
     public GameObject go_title;
     public GameObject scoreText;
+    public GameObject timeText;
+    public GameObject bonus;
+    public GameObject bonus_text;
     public GameObject hi_scoreText;
     public GameObject star_light;
 
@@ -59,9 +63,6 @@ public class GameManager : MonoBehaviour
 
     GameObject block; 
 
-    //float game_Time = 0.0f;
-    //float game_Time_Cnt = 0.0f;
-
     Block_move script;
     static public int star_level =0;         //ためた星の力
     int rensa_cnt;
@@ -85,7 +86,9 @@ public class GameManager : MonoBehaviour
 
     static public int hi_score;
     public int score = 0;
-
+    public float temp_time;
+    int game_time;
+    int old_time;   
     static public int next_block = 1;     
     
     static public int Advent_num = 0;  //新規生成するブロックの背番号 0:wall 1:erase 2:～ブロック
@@ -130,16 +133,17 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-
-
         soundPlayer = GetComponent<AudioSource>();
 
-        Physics2D.gravity = new Vector3(0, -9.81f, 0);  //重力を初期化
+        Physics2D.gravity = new Vector3(0, -9.81f*1.2f, 0);  //重力を初期化
 
         //game_level = 0;         //初期のゲームレベル（落下の加速値）
 
         rensa_cnt = 1;          //連鎖消去のカウンタ
 
+        bonus.SetActive(false);  //ボーナス文字を消す
+        bonus_text.SetActive(false);  //ボーナスノ数値を消す
+        GameClear.SetActive(false);  //ゲームクリア文字を消す
         GameOver.SetActive(false);  //ゲームオーバー文字を消す
         go_title.SetActive(false);  //タイトル画面へ戻るボタンを消す
 
@@ -152,7 +156,6 @@ public class GameManager : MonoBehaviour
         }        
         scoreText.GetComponent<Text>().text = score.ToString();
         hi_scoreText.GetComponent<Text>().text = hi_score.ToString();
-
         
         if(soundPlayer != null)
         {
@@ -169,8 +172,6 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame  
     void FixedUpdate()
     {
-
-
         GameObject block_1_Prefab = Resources.Load<GameObject>("block1");
         GameObject block_2_Prefab = Resources.Load<GameObject>("block2");
         GameObject block_3_Prefab = Resources.Load<GameObject>("block3");
@@ -179,6 +180,21 @@ public class GameManager : MonoBehaviour
         GameObject star_1_Prefab = Resources.Load<GameObject>("star1");
         GameObject star_b_Prefab = Resources.Load<GameObject>("starB");
         GameObject star_c_Prefab = Resources.Load<GameObject>("starC");
+
+        if (trigger != 4 && trigger != 5) {
+            temp_time = 300f - Time.time;         //３００秒以内でクリアできればタイムボーナス
+        }
+
+        if (temp_time <0) {
+            temp_time = 0;
+        }
+        game_time = (int)temp_time;
+        if (old_time != game_time) {
+            timeText.GetComponent<Text>().text = game_time.ToString();
+            old_time = game_time;
+        } 
+
+
         if ( ini_block )
         {
             ini_block = false;  //初期ブロック出力完了
@@ -189,7 +205,7 @@ public class GameManager : MonoBehaviour
             {
 
                 ojama_cnt ++;
-                if (ojama_cnt%15 == 0)
+                if (ojama_cnt%30 == 0)
                 {                                    //お邪魔ブロック５の処理
                     first_block = 5;
                     ojama_cnt = 1;
@@ -610,12 +626,15 @@ public class GameManager : MonoBehaviour
 
             Debug.Log("消去可能なブロック数："+deleteList.Count);
 
-            if (deleteList.Count>0)         //消去可能なブロックはあるか？
+            if (deleteList.Count>0)         //消去可能なブロックがあればブロック消去の処理へ
             {
+                
+                DeleteBlock();          //対象のブロックを消去する
+
                 AudioSource soundPlayer = GetComponent<AudioSource>();
                 if(soundPlayer != null)
-                {
-                    soundPlayer.PlayOneShot(block_erase);
+                {           
+                    soundPlayer.PlayOneShot(block_erase);               //消す音を鳴らす
                 }
 
                 if ( game_level <100 )      //ブロックが消されたら、レベルを上げる（最大値２５５）
@@ -623,36 +642,7 @@ public class GameManager : MonoBehaviour
                     game_level++;   //ゲームレベルを上げる
                     Physics2D.gravity = new Vector3(0, -2*game_level, 0);  //重力を加える
                 }
-
-                //該当する配列をnullにして（内部管理）、ブロックを消去する（見た目）。
-                foreach (var item in deleteList)
-                {
-                    temp_x = ( item.transform.position.x +5.75f )/0.75f;
-                    mat_x = (int)temp_x;
-                    temp_y = 10.0f - ( item.transform.position.y +4.175f )/0.75f;  
-                    mat_y = (int)temp_y;
-
-                    Debug.Log("mat_x : mat_y:"+ mat_x +":"+ mat_y);
-                    block_matrix[(int)mat_y, (int)mat_x] = 0;
-                    block_matrix_tag[(int)mat_y, (int)mat_x] = 0;
-                    
-                    script = item.GetComponent<Block_move>();
-                    script.advent_type = 1;         //ブロック種類を 1 （消去ブロック）へ
-                    Vector3 pos = script.transform.position;
-                    
-                    new_instance = star_1_Prefab;                     
-                    Instantiate( new_instance , pos , Quaternion.Euler(0, 0, 0)); //爆発パターンを生成
-
-                    if (rensa_cnt >=2 ) {
-                        new_instance = star_b_Prefab;                     
-                        Instantiate( new_instance , pos , Quaternion.Euler(0, 0, 0)); //動く星のパターンを生成 
-
-
-                        new_instance = star_c_Prefab;                     
-                        Instantiate( new_instance , pos , Quaternion.Euler(0, 0, 0)); //まわる星のパターンを生成 
-                    }
-                    //Destroy(item);
-                }
+                
                                 //連鎖回数によって分岐処理をする
                 if (rensa_cnt == 1){
                     soundPlayer.PlayOneShot(panpakapan);
@@ -669,6 +659,8 @@ public class GameManager : MonoBehaviour
 
                 star_level += (2 * rensa_cnt + rensa_cnt) *rensa_cnt -1;      //連鎖数に応じてstarlevelを上げる
                 sc_star_level.GetComponent<Text>().text = star_level.ToString();
+                
+                trigger = 1;   //クリアまでは最初のブロック静止判定へ 
 
                 //「ほしの温度計」の更新
                 if (star_level >10) {
@@ -701,11 +693,23 @@ public class GameManager : MonoBehaviour
                 }
                 if (star_level >=100) {           
                     ondokei_10.gameObject.SetActive(false);
+                    trigger = 4;        //ゲームクリアの処理へ
+
+                    score += 100*game_time;    //タイムボーナスを付加
+                    UpdateScore();
+
+                    foreach (var item in blockList)
+                    {
+                    if (item != null)
+                    {
+                        deleteList.Add(item);
+                    }
+                    }
+                    DeleteBlock();      //表示されているブロックを全て消す
                 }
 
                 rensa_cnt++;   //連鎖消去のカウンタ
-
-                trigger = 1;   //最初のブロック静止判定へ戻る   
+ 
             }
             else
             {
@@ -720,7 +724,19 @@ public class GameManager : MonoBehaviour
 
         }
 
-        //if (trigger == 4)   {}        
+        if (trigger == 4)   
+        {
+            GameClear.SetActive(true);      //ゲームクリアを表示
+
+            bonus.SetActive(true);          //ボーナス文字を表示
+            bonus_text.SetActive(true);     //ボーナスノ数値を表示
+            bonus_text.GetComponent<Text>().text = (game_time*100).ToString();
+
+
+
+            go_title.SetActive(true);       //タイトル画面へ戻るボタンを表示
+
+        }        
 
         if (trigger == 5)           //**ゲームオーバー
         {
@@ -762,6 +778,47 @@ public class GameManager : MonoBehaviour
         }       
 
     }
+
+    void DeleteBlock()
+    {
+        GameObject star_1_Prefab = Resources.Load<GameObject>("star1");
+        GameObject star_b_Prefab = Resources.Load<GameObject>("starB");
+        GameObject star_c_Prefab = Resources.Load<GameObject>("starC");
+
+        Debug.Log("消去するブロック数："+deleteList.Count);
+
+        //該当する配列をnullにして（内部管理）、ブロックを消去する（見た目）。
+        foreach (var item in deleteList)
+        {
+            temp_x = ( item.transform.position.x +5.75f )/0.75f;
+            mat_x = (int)temp_x;
+            temp_y = 10.0f - ( item.transform.position.y +4.175f )/0.75f;  
+            mat_y = (int)temp_y;
+
+            Debug.Log("mat_x : mat_y:"+ mat_x +":"+ mat_y);
+            block_matrix[(int)mat_y, (int)mat_x] = 0;
+            block_matrix_tag[(int)mat_y, (int)mat_x] = 0;
+                    
+            script = item.GetComponent<Block_move>();
+            script.advent_type = 1;         //ブロック種類を 1 （消去ブロック）へ
+            Vector3 pos = script.transform.position;
+                    
+            new_instance = star_1_Prefab;                     
+            Instantiate( new_instance , pos , Quaternion.Euler(0, 0, 0)); //爆発パターンを生成
+
+            if (rensa_cnt >=2 ) {
+                new_instance = star_b_Prefab;                     
+                Instantiate( new_instance , pos , Quaternion.Euler(0, 0, 0)); //動く星のパターンを生成 
+
+
+                new_instance = star_c_Prefab;                     
+                Instantiate( new_instance , pos , Quaternion.Euler(0, 0, 0)); //まわる星のパターンを生成 
+            }
+                //Destroy(item);
+        }
+
+    }
+
     void InactiveImage()
     {
         start_text.SetActive(false);
