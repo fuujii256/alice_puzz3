@@ -32,17 +32,16 @@ public class GameManager : MonoBehaviour
     public GameObject hi_scoreText;
     public GameObject star_light;
 
-    //GameObject[] ondokei = new GameObject[10];
-    public GameObject ondokei_1;  //温度計表示のマスク用のオブジェクト　
-    public GameObject ondokei_2; 
-    public GameObject ondokei_3; 
-    public GameObject ondokei_4; 
-    public GameObject ondokei_5; 
-    public GameObject ondokei_6;
-    public GameObject ondokei_7; 
-    public GameObject ondokei_8; 
-    public GameObject ondokei_9; 
-    public GameObject ondokei_10;
+    //public GameObject ondokei_1;  //温度計表示のマスク用のオブジェクト　
+    //public GameObject ondokei_2; 
+    //public GameObject ondokei_3; 
+    //public GameObject ondokei_4; 
+    //public GameObject ondokei_5; 
+    //public GameObject ondokei_6;
+    //public GameObject ondokei_7; 
+    //public GameObject ondokei_8; 
+    //public GameObject ondokei_9; 
+    //public GameObject ondokei_10;
 
     AudioSource soundPlayer;
     public AudioClip meGameStart;
@@ -59,12 +58,13 @@ public class GameManager : MonoBehaviour
     public AudioClip panpakapan;
     public AudioClip yoroshiku;
 
-    public GameObject sc_star_level;
+    //public GameObject sc_star_level;
 
     GameObject block; 
 
     Block_move script;
-    static public int star_level =0;         //ためた星の力
+    int star_level;         //ためた星の力
+    int star_cnt;
     int rensa_cnt;
     int axisH;
     int axisH_old;
@@ -87,6 +87,7 @@ public class GameManager : MonoBehaviour
     static public int hi_score;
     public int score = 0;
     public float temp_time;
+    public float scene_time;
     int game_time;
     int old_time;   
     static public int next_block = 1;     
@@ -133,11 +134,50 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        scene_time = 0;     //ゲーム開始からの時間
+        all_seishi = false;
+        ini_block = true;
+        game_level = 0;
+        m_fSpeed = 0.01f;
+        player_control = false;
+        trigger = 0;
+        star_level =0;
+        star_cnt = 0;
+        next_block = 1;     
+        Advent_num = 0;  //新規生成するブロックの背番号 0:wall 1:erase 2:～ブロック
+
+    block_matrix = new int [11,8]{
+        {1,0,0,0,0,0,0,1},
+        {1,0,0,0,0,0,0,1},
+        {1,0,0,0,0,0,0,1},
+        {1,0,0,0,0,0,0,1},
+        {1,0,0,0,0,0,0,1},
+        {1,0,0,0,0,0,0,1},
+        {1,0,0,0,0,0,0,1},
+        {1,0,0,0,0,0,0,1},
+        {1,0,0,0,0,0,0,1},
+        {1,0,0,0,0,0,0,1},
+        {1,1,1,1,1,1,1,1}
+    }; 
+
+    block_matrix_tag = new int [11,8]{
+        {1,0,0,0,0,0,0,1},
+        {1,0,0,0,0,0,0,1},
+        {1,0,0,0,0,0,0,1},
+        {1,0,0,0,0,0,0,1},
+        {1,0,0,0,0,0,0,1},
+        {1,0,0,0,0,0,0,1},
+        {1,0,0,0,0,0,0,1},
+        {1,0,0,0,0,0,0,1},
+        {1,0,0,0,0,0,0,1},
+        {1,0,0,0,0,0,0,1},
+        {1,1,1,1,1,1,1,1}
+    };   
+
+
         soundPlayer = GetComponent<AudioSource>();
 
         Physics2D.gravity = new Vector3(0, -9.81f*1.2f, 0);  //重力を初期化
-
-        //game_level = 0;         //初期のゲームレベル（落下の加速値）
 
         rensa_cnt = 1;          //連鎖消去のカウンタ
 
@@ -180,9 +220,13 @@ public class GameManager : MonoBehaviour
         GameObject star_1_Prefab = Resources.Load<GameObject>("star1");
         GameObject star_b_Prefab = Resources.Load<GameObject>("starB");
         GameObject star_c_Prefab = Resources.Load<GameObject>("starC");
+        GameObject star_c2_Prefab = Resources.Load<GameObject>("starC2");
+        GameObject star_c3_Prefab = Resources.Load<GameObject>("starC3");
+
+        scene_time += Time.deltaTime;
 
         if (trigger != 4 && trigger != 5) {
-            temp_time = 300f - Time.time;         //３００秒以内でクリアできればタイムボーナス
+            temp_time = 300f - scene_time;         //３００秒以内でクリアできればタイムボーナス
         }
 
         if (temp_time <0) {
@@ -658,46 +702,66 @@ public class GameManager : MonoBehaviour
                 }
 
                 star_level += (2 * rensa_cnt + rensa_cnt) *rensa_cnt -1;      //連鎖数に応じてstarlevelを上げる
-                sc_star_level.GetComponent<Text>().text = star_level.ToString();
+                //sc_star_level.GetComponent<Text>().text = star_level.ToString();
                 
                 trigger = 1;   //クリアまでは最初のブロック静止判定へ 
 
-                //「ほしの温度計」の更新
-                if (star_level >10) {
-                                //マスクを非表示に切り替える
-                    ondokei_1.gameObject.SetActive(false);
+                ////アリスの周りに「ほし」を生成する
+               if (star_level >10 && star_cnt == 0) {
+                    star_cnt = 1;            
+                    new_instance = star_c_Prefab;                     
+                    Instantiate( new_instance); 
+                    //ondokei_1.gameObject.SetActive(false);
                 }
-                if (star_level >20) {
-                    ondokei_2.gameObject.SetActive(false);
-                }
-                if (star_level >30) {
-                    ondokei_3.gameObject.SetActive(false);
-                }
-                if (star_level >40) {
-                    ondokei_4.gameObject.SetActive(false);
-                }
-                if (star_level >50) {
-                    ondokei_5.gameObject.SetActive(false);
-                }
-                if (star_level >60) {
-                    ondokei_6.gameObject.SetActive(false);
-                }
-                if (star_level >70) {
-                    ondokei_7.gameObject.SetActive(false);
-                }
-                if (star_level >80) {
-                    ondokei_8.gameObject.SetActive(false);
-                }
-                if (star_level >90) {
-                    ondokei_9.gameObject.SetActive(false);
-                }
-                if (star_level >=100) {           
-                    ondokei_10.gameObject.SetActive(false);
+               if (star_level >20 && star_cnt == 1) {
+                    star_cnt = 2;            
+                    new_instance = star_c2_Prefab;                     
+                    Instantiate( new_instance);           
+               }
+                if (star_level >30 && star_cnt == 2) {
+                    star_cnt = 3;            
+                    new_instance = star_c3_Prefab;                     
+                    Instantiate( new_instance);           
+               }
+               if (star_level >40 && star_cnt == 3) {
+                    star_cnt = 4;            
+                    new_instance = star_c_Prefab;                     
+                    Instantiate( new_instance);           
+               }
+               if (star_level >50 && star_cnt == 4) {
+                    star_cnt = 5;            
+                    new_instance = star_c2_Prefab;                     
+                    Instantiate( new_instance);           
+               }
+               if (star_level >60 && star_cnt == 5) {
+                    star_cnt = 6;            
+                    new_instance = star_c3_Prefab;                     
+                    Instantiate( new_instance);           
+               }
+               if (star_level >70 && star_cnt == 6) {
+                    star_cnt = 7;            
+                    new_instance = star_c_Prefab;                     
+                    Instantiate( new_instance);           
+               }
+               if (star_level >80 && star_cnt == 7) {
+                    star_cnt = 8;            
+                    new_instance = star_c2_Prefab;                     
+                    Instantiate( new_instance);           
+               }
+               if (star_level >90 && star_cnt == 8) {
+                    star_cnt = 9;            
+                    new_instance = star_c3_Prefab;                     
+                    Instantiate( new_instance);           
+               }
+               if (star_level >=100 && star_cnt == 9) {
+                    star_cnt = 10;            
+                    new_instance = star_c_Prefab;                     
+                    Instantiate( new_instance);           
                     trigger = 4;        //ゲームクリアの処理へ
 
                     score += 100*game_time;    //タイムボーナスを付加
                     UpdateScore();
-
+                
                     foreach (var item in blockList)
                     {
                     if (item != null)
@@ -706,7 +770,7 @@ public class GameManager : MonoBehaviour
                     }
                     }
                     DeleteBlock();      //表示されているブロックを全て消す
-                }
+               }
 
                 rensa_cnt++;   //連鎖消去のカウンタ
  
@@ -784,7 +848,8 @@ public class GameManager : MonoBehaviour
         GameObject star_1_Prefab = Resources.Load<GameObject>("star1");
         GameObject star_b_Prefab = Resources.Load<GameObject>("starB");
         GameObject star_c_Prefab = Resources.Load<GameObject>("starC");
-
+        GameObject star_c2_Prefab = Resources.Load<GameObject>("starC2");
+        GameObject star_c3_Prefab = Resources.Load<GameObject>("starC3");
         Debug.Log("消去するブロック数："+deleteList.Count);
 
         //該当する配列をnullにして（内部管理）、ブロックを消去する（見た目）。
@@ -806,15 +871,14 @@ public class GameManager : MonoBehaviour
             new_instance = star_1_Prefab;                     
             Instantiate( new_instance , pos , Quaternion.Euler(0, 0, 0)); //爆発パターンを生成
 
-            if (rensa_cnt >=2 ) {
-                new_instance = star_b_Prefab;                     
-                Instantiate( new_instance , pos , Quaternion.Euler(0, 0, 0)); //動く星のパターンを生成 
+            //if (rensa_cnt >=2 ) {
+            //    new_instance = star_b_Prefab;                     
+            //    Instantiate( new_instance , pos , Quaternion.Euler(0, 0, 0)); //動く星のパターンを生成 
 
-
-                new_instance = star_c_Prefab;                     
-                Instantiate( new_instance , pos , Quaternion.Euler(0, 0, 0)); //まわる星のパターンを生成 
-            }
-                //Destroy(item);
+            //    new_instance = star_c_Prefab;                     
+            //    Instantiate( new_instance , pos , Quaternion.Euler(0, 0, 0)); //まわる星のパターンを生成 
+            //}
+                
         }
 
     }

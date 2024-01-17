@@ -21,6 +21,7 @@ public class ChangeScene : MonoBehaviour
     //シーンを読み込む
     public void Load()
     {
+        //Application.LoadLevel(sceneName);
         SceneManager.LoadScene(sceneName);
     }
 }

@@ -6,6 +6,7 @@ ScriptsOnlyBuild:
     - ChangeScene
     - GameManager
     - StarLight
+    - Star_bomb
     - intro
     - next_block
     Unity.2D.Animation.Editor.dll:
@@ -111,6 +112,8 @@ ScriptsOnlyBuild:
       Script: {instanceID: 15020}
     - Class: 114
       Script: {instanceID: 15354}
+    - Class: 114
+      Script: {instanceID: 101900}
     - Class: 115
       Script: {instanceID: 0}
     - Class: 128
@@ -178,8 +181,6 @@ ScriptsOnlyBuild:
       Script: {instanceID: 12978}
     - Class: 114
       Script: {instanceID: 13124}
-    - Class: 114
-      Script: {instanceID: 13622}
     - Class: 114
       Script: {instanceID: 13948}
     - Class: 114
@@ -928,7 +929,7 @@ ScriptsOnlyBuild:
     className: StandaloneInputModule
   - hash:
       serializedVersion: 2
-      Hash: 29e27564b4a2facdd2b5713aaa38e78f
+      Hash: 10a2b9eaab8bfbcbf3b576133021740c
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: GameManager
@@ -974,6 +975,12 @@ ScriptsOnlyBuild:
     assemblyName: Unity.Timeline.dll
     namespaceName: UnityEngine.Timeline
     className: PlayableTrack
+  - hash:
+      serializedVersion: 2
+      Hash: 71bb6a6b6c8f052f948db64c7dd3ca4f
+    assemblyName: Assembly-CSharp.dll
+    namespaceName: 
+    className: Star_bomb
   platform: 20
   scenePathNames:
   - Assets/Scenes/intro.unity

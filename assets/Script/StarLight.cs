@@ -12,7 +12,7 @@ public class StarLight : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-    temp_cnt =75000;
+    temp_cnt =70000;
     }
 
     // Update is called once per frame

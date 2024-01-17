@@ -105,7 +105,7 @@ public class Block_move : MonoBehaviour
         float temp_y = 10- (pos.y +4.175f)/0.75f;
         mat_y = (int)temp_y;
 
-        if (advent_type == 1 || mat_y >12 ) 
+        if (advent_type == 1 || mat_y >11 ) 
         {   
             Destroy(this.gameObject);
         }
@@ -114,7 +114,7 @@ public class Block_move : MonoBehaviour
 
        
 
-            if ( GameManager.trigger != 5 )            //ゲームオーバー時は位置取得をしない
+            if ( GameManager.trigger != 5 || advent_type ==1 )            //ゲームオーバー時は位置取得をしない
             {
                 //Debug.Log("x:"+mat_x+" y:"+mat_y);
                 GameManager.block_matrix [old_mat_y,old_mat_x] = 0;
@@ -149,9 +149,13 @@ public class Block_move : MonoBehaviour
     //衝突した時に、一度だけ実行する
     void OnCollisionEnter2D(Collision2D coll) 
     {
-
         GameManager.player_control = false;
-        GameManager.trigger =1; 
-        Debug.Log("GameManager.trigger:"+GameManager.trigger);              //　衝突判定開始フラグをたてる
+
+        if (GameManager.trigger !=5 ){
+            GameManager.trigger =1;
+        }         
+        Debug.Log("GameManager.trigger:"+GameManager.trigger);
+        
+                      //　衝突判定開始フラグをたてる
     }
 }
