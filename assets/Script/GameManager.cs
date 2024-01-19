@@ -58,6 +58,9 @@ public class GameManager : MonoBehaviour
     public AudioClip panpakapan;
     public AudioClip yoroshiku;
 
+    public GameObject tachie_alice;
+    public Sprite smile_tachie_alice; 
+
     //public GameObject sc_star_level;
 
     GameObject block; 
@@ -137,7 +140,7 @@ public class GameManager : MonoBehaviour
         scene_time = 0;     //ゲーム開始からの時間
         all_seishi = false;
         ini_block = true;
-        game_level = 0;
+        game_level = 3;
         m_fSpeed = 0.01f;
         player_control = false;
         trigger = 0;
@@ -177,7 +180,7 @@ public class GameManager : MonoBehaviour
 
         soundPlayer = GetComponent<AudioSource>();
 
-        Physics2D.gravity = new Vector3(0, -9.81f*1.2f, 0);  //重力を初期化
+        Physics2D.gravity = new Vector3(0, -2*game_level, 0);  //重力を加える
 
         rensa_cnt = 1;          //連鎖消去のカウンタ
 
@@ -222,22 +225,24 @@ public class GameManager : MonoBehaviour
         GameObject star_c_Prefab = Resources.Load<GameObject>("starC");
         GameObject star_c2_Prefab = Resources.Load<GameObject>("starC2");
         GameObject star_c3_Prefab = Resources.Load<GameObject>("starC3");
-
-        scene_time += Time.deltaTime;
+        GameObject combo2_Prefab = Resources.Load<GameObject>("2_combo");
+        GameObject combo3_Prefab = Resources.Load<GameObject>("3_combo");
+        GameObject combo4_Prefab = Resources.Load<GameObject>("4_combo");
+        GameObject combo5_Prefab = Resources.Load<GameObject>("5_combo");
 
         if (trigger != 4 && trigger != 5) {
+            scene_time += Time.deltaTime;
             temp_time = 300f - scene_time;         //３００秒以内でクリアできればタイムボーナス
-        }
 
-        if (temp_time <0) {
-            temp_time = 0;
+            if (temp_time <0) {
+                temp_time = 0;
+            }
+            game_time = (int)temp_time;
+            if (old_time != game_time) {
+                timeText.GetComponent<Text>().text = game_time.ToString();
+                old_time = game_time;
+            } 
         }
-        game_time = (int)temp_time;
-        if (old_time != game_time) {
-            timeText.GetComponent<Text>().text = game_time.ToString();
-            old_time = game_time;
-        } 
-
 
         if ( ini_block )
         {
@@ -405,7 +410,10 @@ public class GameManager : MonoBehaviour
                 }
 
             }
-            
+            //左に行き過ぎるBUGをFIX
+            if (blockList[list_num].transform.position.x <-5.0f) {
+               blockList[list_num].transform.Translate (-0.75f*axisH, 0, 0);             
+            }
 
             axisH_old = axisH;
             axisV_old = axisV;
@@ -672,8 +680,9 @@ public class GameManager : MonoBehaviour
 
             if (deleteList.Count>0)         //消去可能なブロックがあればブロック消去の処理へ
             {
-                
-                DeleteBlock();          //対象のブロックを消去する
+                Vector3 pos = deleteList[0].transform.position;     //最初に削除されるブロックの位置を取得
+
+                DeleteBlock();          //対象のブロックを消去
 
                 AudioSource soundPlayer = GetComponent<AudioSource>();
                 if(soundPlayer != null)
@@ -693,12 +702,23 @@ public class GameManager : MonoBehaviour
                 }
                 if (rensa_cnt == 2){
                     soundPlayer.PlayOneShot(yarimashita);
+                    new_instance = combo2_Prefab;                     
+                    Instantiate( new_instance , pos , Quaternion.Euler(0, 0, 0)); //爆発パターンを生成
                 }
                 if (rensa_cnt == 3){
                     soundPlayer.PlayOneShot(sugoidesu);
+                    new_instance = combo3_Prefab;                     
+                    Instantiate( new_instance , pos , Quaternion.Euler(0, 0, 0)); //爆発パターンを生成
                 }
                 if (rensa_cnt >= 4){
                     soundPlayer.PlayOneShot(kangekidesu);
+                    new_instance = combo4_Prefab;                     
+                    Instantiate( new_instance , pos , Quaternion.Euler(0, 0, 0)); //爆発パターンを生成
+                }
+                if (rensa_cnt >= 5){
+                    soundPlayer.PlayOneShot(kangekidesu);
+                    new_instance = combo5_Prefab;                     
+                    Instantiate( new_instance , pos , Quaternion.Euler(0, 0, 0)); //爆発パターンを生成
                 }
 
                 star_level += (2 * rensa_cnt + rensa_cnt) *rensa_cnt -1;      //連鎖数に応じてstarlevelを上げる
@@ -759,8 +779,13 @@ public class GameManager : MonoBehaviour
                     Instantiate( new_instance);           
                     trigger = 4;        //ゲームクリアの処理へ
 
-                    score += 100*game_time;    //タイムボーナスを付加
-                    UpdateScore();
+                    if(soundPlayer != null) {
+                        soundPlayer.PlayOneShot(arigatou);      //ありがとうございます、アリス幸せです
+                    }
+
+                    tachie_alice.GetComponent<SpriteRenderer>().sprite= smile_tachie_alice;
+                    //score += 100*game_time;    //タイムボーナスを付加
+                    //UpdateScore();
                 
                     foreach (var item in blockList)
                     {
@@ -791,12 +816,21 @@ public class GameManager : MonoBehaviour
         if (trigger == 4)   
         {
             GameClear.SetActive(true);      //ゲームクリアを表示
+            
+            
+            //bonus.SetActive(true);          //ボーナス文字を表示
+            //bonus_text.SetActive(true);     //ボーナスノ数値を表示
 
-            bonus.SetActive(true);          //ボーナス文字を表示
-            bonus_text.SetActive(true);     //ボーナスノ数値を表示
-            bonus_text.GetComponent<Text>().text = (game_time*100).ToString();
-
-
+            if (game_time > 0) {
+                game_time = game_time -2;
+                score += 20;
+                timeText.GetComponent<Text>().text = game_time.ToString();
+                UpdateScore();
+            }
+            else {
+                game_time = 0;
+                timeText.GetComponent<Text>().text = game_time.ToString();
+            }
 
             go_title.SetActive(true);       //タイトル画面へ戻るボタンを表示
 
@@ -880,7 +914,7 @@ public class GameManager : MonoBehaviour
             //}
                 
         }
-
+        //return pos.x,;
     }
 
     void InactiveImage()
