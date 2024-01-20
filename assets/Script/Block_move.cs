@@ -6,9 +6,9 @@ public class Block_move : MonoBehaviour
 {
     Rigidbody2D rbody;
     Animator animator;
-    public string block_matataki;
+    //public string block_matataki;
     //public GameObject star_light;
-    public string block_matataki_stop;
+    //public string block_matataki_stop;
     //string nowAnime = "";
     //string oldAnime = "";
 

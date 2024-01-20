@@ -47,6 +47,9 @@ public class GameManager : MonoBehaviour
     public AudioClip meGameStart;
     public AudioClip meGamePlaying;
     public AudioClip meGameOver;
+    public AudioClip meGameOverBGM;
+    public AudioClip meGameClearBGM;
+
     public AudioClip block_erase;
     public AudioClip block_move;
     public AudioClip block_rakka;
@@ -180,7 +183,7 @@ public class GameManager : MonoBehaviour
 
         soundPlayer = GetComponent<AudioSource>();
 
-        Physics2D.gravity = new Vector3(0, -2*game_level, 0);  //重力を加える
+        Physics2D.gravity = new Vector3(0, -1.6f*game_level, 0);  //重力を加える
 
         rensa_cnt = 1;          //連鎖消去のカウンタ
 
@@ -229,6 +232,8 @@ public class GameManager : MonoBehaviour
         GameObject combo3_Prefab = Resources.Load<GameObject>("3_combo");
         GameObject combo4_Prefab = Resources.Load<GameObject>("4_combo");
         GameObject combo5_Prefab = Resources.Load<GameObject>("5_combo");
+
+        AudioSource audio = GetComponent<AudioSource>();
 
         if (trigger != 4 && trigger != 5) {
             scene_time += Time.deltaTime;
@@ -334,8 +339,10 @@ public class GameManager : MonoBehaviour
                 {
                     trigger = 5;             //出現位置に既にブロックがあったら、ゲームオーバー処理へ
                 
-                    soundPlayer.Stop();
+
+                    audio.Stop();
                     soundPlayer.PlayOneShot(meGameOver);
+                    soundPlayer.PlayOneShot(meGameOverBGM);
                 
                     Physics2D.gravity = new Vector3(0, -100, 0);  //重力を加える
                     
@@ -779,8 +786,10 @@ public class GameManager : MonoBehaviour
                     Instantiate( new_instance);           
                     trigger = 4;        //ゲームクリアの処理へ
 
+                    audio.Stop();
                     if(soundPlayer != null) {
                         soundPlayer.PlayOneShot(arigatou);      //ありがとうございます、アリス幸せです
+                        soundPlayer.PlayOneShot(meGameClearBGM);
                     }
 
                     tachie_alice.GetComponent<SpriteRenderer>().sprite= smile_tachie_alice;
@@ -822,8 +831,8 @@ public class GameManager : MonoBehaviour
             //bonus_text.SetActive(true);     //ボーナスノ数値を表示
 
             if (game_time > 0) {
-                game_time = game_time -2;
-                score += 20;
+                game_time = game_time -1;
+                score += 10;
                 timeText.GetComponent<Text>().text = game_time.ToString();
                 UpdateScore();
             }
@@ -833,6 +842,20 @@ public class GameManager : MonoBehaviour
             }
 
             go_title.SetActive(true);       //タイトル画面へ戻るボタンを表示
+
+            // 現在のキーボード情報
+            var current = Keyboard.current;
+            // キーボード接続チェック
+            if (current != null) 
+            {
+                var eKey = current.enterKey;
+                // Aキーが押されているかどうか
+                if (eKey.isPressed)
+            {
+                SceneManager.LoadScene("title");
+            }
+
+            }
 
         }        
 
@@ -845,6 +868,20 @@ public class GameManager : MonoBehaviour
             //AudioListener.volume = 0f;
             
             ini_block = false;
+
+            // 現在のキーボード情報
+            var current = Keyboard.current;
+            // キーボード接続チェック
+            if (current != null) 
+            {
+                var eKey = current.enterKey;
+               
+                if (eKey.isPressed)
+            {
+                SceneManager.LoadScene("title");
+            }
+
+            }
 
         }
 
