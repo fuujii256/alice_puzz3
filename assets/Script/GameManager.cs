@@ -622,7 +622,7 @@ public class GameManager : MonoBehaviour
                         }
                         else
                         {
-                            if (block_matrix_tag[i, j] == block_matrix_tag[i+1 , j +1])
+                            if (block_matrix_tag[i, j] == block_matrix_tag[i +1 , j +1])
                             {
                                 Debug.Log("width_L3_success3!");
                                 score +=30 * rensa_cnt * rensa_cnt;
@@ -642,7 +642,7 @@ public class GameManager : MonoBehaviour
                             }
                             else
                             {
-                                if (block_matrix_tag[i, j] == block_matrix_tag[i-1 , j +1])
+                                if (block_matrix_tag[i, j] == block_matrix_tag[i -1 , j +1])
                                 {
                                     Debug.Log("width_L4_success3!");
                                     score +=30 * rensa_cnt * rensa_cnt;
@@ -660,7 +660,30 @@ public class GameManager : MonoBehaviour
                                     script = blockList[k].GetComponent<Block_move>();
                                     script.isMatching = true;
                                 }
+                                
+                                else
+                                {
+                                    if (block_matrix_tag[i, j] == block_matrix_tag[i +1 , j ])
+                                    {
+                                        Debug.Log("width_L4_success3!");
+                                        score +=30 * rensa_cnt * rensa_cnt;
+                                        UpdateScore();
+                                        //block_moveのisMatchingをtrueに
+                                        k = (int)block_matrix[i,j];                        
+                                        script = blockList[k].GetComponent<Block_move>();
+                                        script.isMatching = true;
+
+                                        k = (int)block_matrix[i,j+1];   
+                                        script = blockList[k].GetComponent<Block_move>();
+                                        script.isMatching = true;
+
+                                        k = (int)block_matrix[i+1,j];    
+                                        script = blockList[k].GetComponent<Block_move>();
+                                        script.isMatching = true;
+                                    }
+                                }    
                             }    
+
                             
                         }
                         
@@ -700,7 +723,7 @@ public class GameManager : MonoBehaviour
                 if ( game_level <100 )      //ブロックが消されたら、レベルを上げる（最大値２５５）
                 {
                     game_level++;   //ゲームレベルを上げる
-                    Physics2D.gravity = new Vector3(0, -2*game_level, 0);  //重力を加える
+                    Physics2D.gravity = new Vector3(0, -1*game_level, 0);  //重力を加える
                 }
                 
                                 //連鎖回数によって分岐処理をする
