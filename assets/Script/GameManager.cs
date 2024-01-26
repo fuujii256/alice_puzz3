@@ -4,7 +4,10 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
- 
+
+using unityroom.Api;
+
+
 public class GameManager : MonoBehaviour
 {    
     public InputAction m_input_Mover;
@@ -991,6 +994,10 @@ public class GameManager : MonoBehaviour
         } 
 
         hi_scoreText.GetComponent<Text>().text = hi_score.ToString();
+
+        // unityromのスコアボードNo1にスコアを送信する。
+        UnityroomApiClient.Instance.SendScore(1, (float)score , ScoreboardWriteMode.Always);
+ 
 
     }
 
