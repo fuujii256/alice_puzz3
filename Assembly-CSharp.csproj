@@ -38,6 +38,7 @@
   <ItemGroup>
      <Compile Include="Assets\Script\combo.cs" />
      <Compile Include="Assets\Script\Star_bomb.cs" />
+     <Compile Include="Assets\Script\storyManager.cs" />
      <Compile Include="Assets\Script\GameManager.cs" />
      <Compile Include="Assets\Script\CameraManager.cs" />
      <Compile Include="Assets\Script\title.cs" />
@@ -48,7 +49,7 @@
      <Compile Include="Assets\Script\Block_move.cs" />
      <Compile Include="Assets\Script\next_block.cs" />
      <Compile Include="Assets\Script\titleStar.cs" />
-     <Compile Include="Assets\Script\storyManager.cs" />
+     <Compile Include="Assets\Script\momoi_block_erase.cs" />
      <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />
      <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile Overlay.shader" />
      <None Include="Assets\TextMesh Pro\Shaders\TMP_Bitmap.shader" />

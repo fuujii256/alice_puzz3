@@ -64,6 +64,11 @@ public class GameManager : MonoBehaviour
     public AudioClip panpakapan;
     public AudioClip yoroshiku;
 
+    public GameObject momoi_block;
+    public GameObject midori_block;
+    public GameObject alice_block;
+    public GameObject yuzu_block;
+
     public GameObject tachie_alice;
     public Sprite smile_tachie_alice; 
 
@@ -108,6 +113,8 @@ public class GameManager : MonoBehaviour
     float next_x;
     float next_y;
     float next_z;
+
+    int aNum;
 
     public bool all_seishi = false; //全てのオブジェクトが静止しているか？
     public List<GameObject> blockList = new List<GameObject>();   //管理するブロックのリスト
@@ -195,6 +202,11 @@ public class GameManager : MonoBehaviour
         GameClear.SetActive(false);  //ゲームクリア文字を消す
         GameOver.SetActive(false);  //ゲームオーバー文字を消す
         go_title.SetActive(false);  //タイトル画面へ戻るボタンを消す
+
+        momoi_block.SetActive(false);   //モモイほか４名のアニメーションを消す
+        midori_block.SetActive(false);
+        alice_block.SetActive(false);
+        yuzu_block.SetActive(false);
 
         //初期のNEXTブロックの値をつくる
         next_block = Random.Range(1, 5);
@@ -710,18 +722,50 @@ public class GameManager : MonoBehaviour
             }
 
             Debug.Log("消去可能なブロック数："+deleteList.Count);
+            Debug.Log("消去するブロックの種類（代表）："+aNum);
 
             if (deleteList.Count>0)         //消去可能なブロックがあればブロック消去の処理へ
             {
                 Vector3 pos = deleteList[0].transform.position;     //最初に削除されるブロックの位置を取得
 
-                DeleteBlock();          //対象のブロックを消去
+                aNum = deleteList[0].GetComponent<Block_move>().advent_type;
 
                 AudioSource soundPlayer = GetComponent<AudioSource>();
                 if(soundPlayer != null)
                 {           
                     soundPlayer.PlayOneShot(block_erase);               //消す音を鳴らす
                 }
+
+                //最初に消したブロックの種類でBGのアニメーションの種類を切り替え表示する
+
+
+
+                if (aNum == 2) {
+
+                    momoi_block.SetActive(true);   
+                }
+                else{
+                    if (aNum == 3) {
+
+                        alice_block.SetActive(true);
+                    }
+                    else
+                    {
+                        if (aNum == 4) {
+ 
+                            midori_block.SetActive(true);
+                        }
+                        else
+                        {
+                            if (aNum == 5) {
+
+                                yuzu_block.SetActive(true);
+                            }
+                        }
+                    }
+
+                }
+
 
                 if ( game_level <100 )      //ブロックが消されたら、レベルを上げる（最大値２５５）
                 {
@@ -833,6 +877,9 @@ public class GameManager : MonoBehaviour
                }
 
                 rensa_cnt++;   //連鎖消去のカウンタ
+
+            
+                DeleteBlock();          //対象のブロックを消去
  
             }
             else
