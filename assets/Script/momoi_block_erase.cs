@@ -12,7 +12,7 @@ public class momoi_block_erase : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-    temp_cnt =75;
+    temp_cnt =60;
     }
 
     // Update is called once per frame
@@ -21,8 +21,8 @@ public class momoi_block_erase : MonoBehaviour
         temp_cnt--;
         if (temp_cnt <= 0)
         {
-            this.gameObject.SetActive(false); 
-            //Destroy(this.gameObject);
+            //this.gameObject.SetActive(false); 
+            Destroy(this.gameObject);
         }
             
     }

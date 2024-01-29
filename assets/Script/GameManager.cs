@@ -162,33 +162,35 @@ public class GameManager : MonoBehaviour
         next_block = 1;     
         Advent_num = 0;  //新規生成するブロックの背番号 0:wall 1:erase 2:～ブロック
 
-    block_matrix = new int [11,8]{
-        {1,0,0,0,0,0,0,1},
-        {1,0,0,0,0,0,0,1},
-        {1,0,0,0,0,0,0,1},
-        {1,0,0,0,0,0,0,1},
-        {1,0,0,0,0,0,0,1},
-        {1,0,0,0,0,0,0,1},
-        {1,0,0,0,0,0,0,1},
-        {1,0,0,0,0,0,0,1},
-        {1,0,0,0,0,0,0,1},
-        {1,0,0,0,0,0,0,1},
-        {1,1,1,1,1,1,1,1}
-    }; 
+        aNum = 1;
 
-    block_matrix_tag = new int [11,8]{
-        {1,0,0,0,0,0,0,1},
-        {1,0,0,0,0,0,0,1},
-        {1,0,0,0,0,0,0,1},
-        {1,0,0,0,0,0,0,1},
-        {1,0,0,0,0,0,0,1},
-        {1,0,0,0,0,0,0,1},
-        {1,0,0,0,0,0,0,1},
-        {1,0,0,0,0,0,0,1},
-        {1,0,0,0,0,0,0,1},
-        {1,0,0,0,0,0,0,1},
-        {1,1,1,1,1,1,1,1}
-    };   
+        block_matrix = new int [11,8]{
+            {1,0,0,0,0,0,0,1},
+            {1,0,0,0,0,0,0,1},
+            {1,0,0,0,0,0,0,1},
+            {1,0,0,0,0,0,0,1},
+            {1,0,0,0,0,0,0,1},
+            {1,0,0,0,0,0,0,1},
+            {1,0,0,0,0,0,0,1},
+            {1,0,0,0,0,0,0,1},
+            {1,0,0,0,0,0,0,1},
+            {1,0,0,0,0,0,0,1},
+            {1,1,1,1,1,1,1,1}
+        }; 
+
+        block_matrix_tag = new int [11,8]{
+            {1,0,0,0,0,0,0,1},
+            {1,0,0,0,0,0,0,1},
+            {1,0,0,0,0,0,0,1},
+            {1,0,0,0,0,0,0,1},
+            {1,0,0,0,0,0,0,1},
+            {1,0,0,0,0,0,0,1},
+            {1,0,0,0,0,0,0,1},
+            {1,0,0,0,0,0,0,1},
+            {1,0,0,0,0,0,0,1},
+            {1,0,0,0,0,0,0,1},
+            {1,1,1,1,1,1,1,1}
+        };   
 
 
         soundPlayer = GetComponent<AudioSource>();
@@ -203,10 +205,10 @@ public class GameManager : MonoBehaviour
         GameOver.SetActive(false);  //ゲームオーバー文字を消す
         go_title.SetActive(false);  //タイトル画面へ戻るボタンを消す
 
-        momoi_block.SetActive(false);   //モモイほか４名のアニメーションを消す
-        midori_block.SetActive(false);
-        alice_block.SetActive(false);
-        yuzu_block.SetActive(false);
+        //momoi_block.SetActive(false);   //モモイほか４名のアニメーションを消す
+        //midori_block.SetActive(false);
+        //alice_block.SetActive(false);
+        //yuzu_block.SetActive(false);
 
         //初期のNEXTブロックの値をつくる
         next_block = Random.Range(1, 5);
@@ -247,6 +249,12 @@ public class GameManager : MonoBehaviour
         GameObject combo3_Prefab = Resources.Load<GameObject>("3_combo");
         GameObject combo4_Prefab = Resources.Load<GameObject>("4_combo");
         GameObject combo5_Prefab = Resources.Load<GameObject>("5_combo");
+
+        GameObject momoi_block_Prefab = Resources.Load<GameObject>("momoi_block");
+        GameObject midori_block_Prefab = Resources.Load<GameObject>("midori_block");
+        GameObject alice_block_Prefab = Resources.Load<GameObject>("alice_block");
+        GameObject yuzu_block_Prefab = Resources.Load<GameObject>("yuzu_block");
+        //GameObject yuka_Prefab = Resources.Load<GameObject>("yuka_block");
 
         AudioSource audio = GetComponent<AudioSource>();
 
@@ -717,6 +725,7 @@ public class GameManager : MonoBehaviour
                     if (item.GetComponent<Block_move>().isMatching == true)
                         {
                             deleteList.Add(item);
+                            aNum = item.GetComponent<Block_move>().advent_type;
                         }
                 }        
             }
@@ -728,7 +737,7 @@ public class GameManager : MonoBehaviour
             {
                 Vector3 pos = deleteList[0].transform.position;     //最初に削除されるブロックの位置を取得
 
-                aNum = deleteList[0].GetComponent<Block_move>().advent_type;
+                //aNum = deleteList[0].GetComponent<Block_move>().advent_type;
 
                 AudioSource soundPlayer = GetComponent<AudioSource>();
                 if(soundPlayer != null)
@@ -737,29 +746,42 @@ public class GameManager : MonoBehaviour
                 }
 
                 //最初に消したブロックの種類でBGのアニメーションの種類を切り替え表示する
+                //aNum ++;
+                //if (aNum >5) {
+                //    aNum = 2;
+                //}
 
-
+                pos = this.transform.position;
 
                 if (aNum == 2) {
-
-                    momoi_block.SetActive(true);   
+                    new_instance = momoi_block_Prefab;                     
+                    Instantiate( new_instance , pos , Quaternion.Euler(0, 0, 0));
+                    //momoi_block.SetActive(true);
+                    Debug.Log("momoi red!!");   
                 }
                 else{
                     if (aNum == 3) {
-
-                        alice_block.SetActive(true);
+                        new_instance = alice_block_Prefab;                     
+                        Instantiate( new_instance , pos , Quaternion.Euler(0, 0, 0));
+                        //alice_block.SetActive(true);
+                        Debug.Log("alice_blue!!"); 
+                        
                     }
                     else
                     {
                         if (aNum == 4) {
- 
-                            midori_block.SetActive(true);
+                            new_instance = midori_block_Prefab;                     
+                            Instantiate( new_instance , pos , Quaternion.Euler(0, 0, 0));
+                            //midori_block.SetActive(true);
+                            Debug.Log("midori_green!!"); 
                         }
                         else
                         {
                             if (aNum == 5) {
-
-                                yuzu_block.SetActive(true);
+                                new_instance = yuzu_block_Prefab;                     
+                                Instantiate( new_instance , pos , Quaternion.Euler(0, 0, 0));
+                                //yuzu_block.SetActive(true);
+                                Debug.Log("yuzu_yellow!!"); 
                             }
                         }
                     }
